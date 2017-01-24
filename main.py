@@ -16,18 +16,36 @@
 #
 import webapp2
 import caesar;
+import cgi;
 
+def buildPage(text = "", rot = ""):
+    content = """
+        <h1>Web Caesar</h1>
+        <h3>Enter text to encrypt</h3>
+        <form method="post">
+            <textarea name="text" style="height: 100px; width: 300px">{}</textarea>
+            <br>
+            <h3>Enter rotation amount</h3>
+            <input type="number" name="rot" value="{}">
+            <input type="submit"/>
+        </form>
+    """.format(text, rot);
 
+    return content;
 
 class MainHandler(webapp2.RequestHandler):
     def get(self):
-        content = """
-            <form>
-                <textarea name="text"></textarea>
-                <br>
-                <input type="submit"/>
-            </form>
-        """
+
+        content = buildPage();
+        self.response.write(content);
+
+    def post(self):
+        text = self.request.get("text");
+        rot = int(self.request.get("rot"));
+        result = caesar.encrypt(text, rot);
+        escapedResult = cgi.escape(result);
+
+        content = buildPage(escapedResult, rot);
         self.response.write(content);
 
 app = webapp2.WSGIApplication([
